@@ -10,6 +10,7 @@ module Node.Websocket.Connection
   , drop
   , sendUTF
   , sendBytes
+  , sendMessage
   , ping
   , pong
   , MessageCallback
@@ -31,7 +32,7 @@ import Control.Monad.Eff.Exception (Error)
 import Data.Either (Either(..))
 import Data.Nullable (Nullable)
 import Node.Buffer (Buffer)
-import Node.Websocket.Types (CloseDescription, CloseReason, TextFrame, WSConnection, WSSERVER, BinaryFrame)
+import Node.Websocket.Types (CloseDescription, CloseReason, TextFrame(..), WSConnection, WSSERVER, BinaryFrame(..))
 
 foreign import closeDescription :: WSConnection -> Nullable CloseDescription
 
@@ -57,6 +58,11 @@ foreign import drop :: forall e. WSConnection -> CloseReason -> CloseDescription
 foreign import sendUTF :: forall e. WSConnection -> String -> Eff (wss :: WSSERVER | e) Unit
 
 foreign import sendBytes :: forall e. WSConnection -> Buffer -> Eff (wss :: WSSERVER | e) Unit
+
+sendMessage :: forall e. WSConnection -> Either TextFrame BinaryFrame -> Eff (wss :: WSSERVER | e) Unit
+sendMessage conn = case _ of
+  Left (TextFrame msg) -> sendUTF conn msg.utf8Data
+  Right (BinaryFrame msg) -> sendBytes conn msg.binaryData
 
 foreign import ping :: forall e. WSConnection -> Buffer -> Eff (wss :: WSSERVER | e) Unit
 
