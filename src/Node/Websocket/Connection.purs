@@ -39,6 +39,7 @@ foreign import closeDescription :: WSConnection -> Nullable CloseDescription
 foreign import closeReasonCode :: WSConnection -> CloseReason
 
 -- TODO: implement socket
+-- Problem: there's no bindings to node's net module
 
 foreign import protocol :: WSConnection -> String
 
