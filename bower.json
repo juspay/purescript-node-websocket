@@ -1,5 +1,5 @@
 {
-  "name": "websocket-node",
+  "name": "purescript-node-websocket",
   "ignore": [
     "**/.*",
     "node_modules",
