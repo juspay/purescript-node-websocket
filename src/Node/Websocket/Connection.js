@@ -82,6 +82,14 @@ exports.pong = function (conn) {
   }
 }
 
+exports.sendFrame = function (conn) {
+  return function (frame) {
+    return function () {
+      conn.sendFrame(frame);
+    }
+  }
+}
+
 exports.onMessageImpl = function (Left) {
   return function (Right) {
     return function (conn) {
@@ -96,6 +104,16 @@ exports.onMessageImpl = function (Left) {
           })
         }
       }
+    }
+  }
+}
+
+exports.onFrame = function (conn) {
+  return function (callback) {
+    return function () {
+      conn.on("frame", function (frame) {
+        callback(frame)();
+      })
     }
   }
 }

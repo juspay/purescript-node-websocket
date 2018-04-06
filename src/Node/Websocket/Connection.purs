@@ -13,8 +13,11 @@ module Node.Websocket.Connection
   , sendMessage
   , ping
   , pong
+  , sendFrame
   , MessageCallback
   , onMessage
+  , FrameCallback
+  , onFrame
   , ErrorCallback
   , onError
   , CloseCallback
@@ -32,7 +35,7 @@ import Control.Monad.Eff.Exception (Error)
 import Data.Either (Either(..))
 import Data.Nullable (Nullable)
 import Node.Buffer (Buffer)
-import Node.Websocket.Types (CloseDescription, CloseReason, TextFrame(..), WSConnection, WSSERVER, BinaryFrame(..))
+import Node.Websocket.Types (BinaryFrame(..), CloseDescription, CloseReason, TextFrame(..), WSConnection, WSFrame, WSSERVER)
 
 foreign import closeDescription :: WSConnection -> Nullable CloseDescription
 
@@ -69,7 +72,7 @@ foreign import ping :: forall e. WSConnection -> Buffer -> Eff (wss :: WSSERVER 
 
 foreign import pong :: forall e. WSConnection -> Buffer -> Eff (wss :: WSSERVER | e) Unit
 
--- TODO: Implement onFrame
+foreign import sendFrame :: forall e. WSConnection -> WSFrame -> Eff (wss :: WSSERVER | e) Unit
 
 type MessageCallback e = Either TextFrame BinaryFrame -> Eff (wss :: WSSERVER | e) Unit
 
@@ -77,6 +80,10 @@ foreign import onMessageImpl :: forall a b e. (a -> Either a b) -> (b -> Either 
 
 onMessage :: forall e. WSConnection -> MessageCallback e -> Eff (wss :: WSSERVER | e) Unit
 onMessage = onMessageImpl Left Right
+
+type FrameCallback e = WSFrame -> Eff (wss :: WSSERVER | e) Unit
+
+foreign import onFrame :: forall e. WSConnection -> FrameCallback e -> Eff (wss :: WSSERVER | e) Unit
 
 type CloseCallback e = CloseReason -> CloseDescription -> Eff (wss :: WSSERVER | e) Unit
 
